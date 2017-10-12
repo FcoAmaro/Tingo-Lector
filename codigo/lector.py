@@ -1,5 +1,8 @@
 import re
 import getpass
+import requests
+#import sqlite
+import json
 
 #while True:
     #barcode = raw_input("Escanear: ")
@@ -20,18 +23,28 @@ import getpass
     #print "Codigo escaneado: " + barcode
 
 
-val = re.compile('TID.')
+val = re.compile('^TID[0-9a-f]{24}$')
 
 while True:
 	#Paso 1
-  cod = getpass.getpass('Escanear codigo: ')
+  cod = getpass.getpass('ESCANEAR CODIGO: ')
   if re.match('exit',cod): 
   	print 'Adios'
   	break
 
   if val.match(cod):
-    print 'Es TingoID'
+    #print 'Puede ser TingoID'
     #Paso 2
     #Hacer query a base de datos Tingo para consultar dada una empresa
+    url = "http://localhost:8000/usarEntrada/" + cod
+    test = "http://httpbin.org/post"
+    myResponse = requests.post(test,data={'key':'value'})
+    if (myResponse.ok):
+    	print "Tinket: " + str(myResponse.headers)
+    	#Recibimos un id correspondiente a ticket
+    	#procede a validar en la base de datos de la empresa
+    	
+    else: 
+    	print "No se encontraron tinkets asociados"
   else:
-    print 'NO'
+    print 'El ticket escaneado no es valido'
