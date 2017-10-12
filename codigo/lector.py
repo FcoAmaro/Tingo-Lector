@@ -1,6 +1,5 @@
 import re
 import getpass
-import psycopg2
 
 #while True:
     #barcode = raw_input("Escanear: ")
