@@ -1,8 +1,8 @@
 import re
 import getpass
 import requests
-#import sqlite
 import json
+import ipaddress
 
 #while True:
     #barcode = raw_input("Escanear: ")
@@ -21,30 +21,45 @@ import json
     #	b- Si hay respuesta ok, validar. (trigger) enviar actualizacion a TingoID
     #5. Mostrar el ticket validado o invalidado
     #print "Codigo escaneado: " + barcode
+ip_apitingo = ipaddress.ip_address('10.6.43.164') #Ip API de Tingo
+id_empresa = 1 #Asignar el id correspondiente a la empresa asociada a esta estacion de TingoID
+val = re.compile('^TID.')
+nti = re.compile('^CASINO.')
 
-
-val = re.compile('^TID[0-9a-f]{24}$')
-
-while True:
+def lector(cod):
+#while True:
 	#Paso 1
-  cod = getpass.getpass('ESCANEAR CODIGO: ')
+  #cod = getpass.getpass('ESCANEAR CODIGO: ')
+  tinket = cod[3:]
+  #No se si implementar esta funcion, quizas para un cierre forzado y necesario
   if re.match('exit',cod): 
-  	print 'Adios'
-  	break
+  	return ("Programa Finalizado","yellow")
+  
+  elif re.match('CASINO.',cod):
+  	return ("El ticket no pertenece a TingoID,\npero puede ser valido","green")
 
-  if val.match(cod):
+  elif re.match('TID.',cod):
     #print 'Puede ser TingoID'
     #Paso 2
     #Hacer query a base de datos Tingo para consultar dada una empresa
-    url = "http://localhost:8000/usarEntrada/" + cod
-    test = "http://httpbin.org/post"
-    myResponse = requests.post(test,data={'key':'value'})
-    if (myResponse.ok):
-    	print "Tinket: " + str(myResponse.headers)
+    url ='http://'+'10.6.43.164:8000'+'/tingo/usarEntrada/'
+    #url = 'http://'+empresa.ip+empresa.puerto+'/'+empresa.nombre+'/detalle'
+    data = {'id_usuario': 3,
+            'id_empresa': 1 }
+    datajson = json.dumps(data)
+    response = requests.post(url, data=datajson) #json.dumps(data))
+    response_data = json.loads(response.text)
+    discount = str(response_data['discount'])
+    mensaje = str(response_data['mensaje'])
+    
+    if (response.ok):
+    	return (mensaje,"green")
     	#Recibimos un id correspondiente a ticket
-    	#procede a validar en la base de datos de la empresa
+    	#Procede a validar en la base de datos de la empresa
+    	#Este mensaje lo manda la API de TingoID
     	
     else: 
-    	print "No se encontraron tinkets asociados"
+    	return ("Error Fatal")#Este error no existe, ya que si no se almacena la APITingo nos envia ese mensaje.
+  
   else:
-    print 'El ticket escaneado no es valido'
+    return ("El ticket escaneado no pertenece a TingoID,\nvuelva a escanear un Ticket Valido","red")
