@@ -33,16 +33,17 @@ def lector(cod):
   tinket = cod[3:]
   #No se si implementar esta funcion, quizas para un cierre forzado y necesario
   if re.match('exit',cod): 
-  	return ("Programa Finalizado","yellow")
+  	return ("Programa Finalizado",3)
   
   elif re.match('CASINO.',cod):
-  	return ("El ticket no pertenece a TingoID,\npero puede ser valido","green")
+  	return ("El codigo no pertenece a \nTingoID, pero puede \nser valido",2)
 
   elif re.match('TID.',cod):
+    #return ("Tinket pertenece a TingoID,\npuede ser valido",1)
     #print 'Puede ser TingoID'
     #Paso 2
     #Hacer query a base de datos Tingo para consultar dada una empresa
-    url ='http://'+'10.6.43.164:8000'+'/tingo/usarEntrada/'
+    url ='http://'+'10.6.43.212:8000'+'/tingo/usarEntrada/'
     #url = 'http://'+empresa.ip+empresa.puerto+'/'+empresa.nombre+'/detalle'
     data = {'id_usuario': 3,
             'id_empresa': 1 }
@@ -59,7 +60,7 @@ def lector(cod):
     	#Este mensaje lo manda la API de TingoID
     	
     else: 
-    	return ("Error Fatal")#Este error no existe, ya que si no se almacena la APITingo nos envia ese mensaje.
+    	return ("Error Fatal")#Este error no existe, ya que si no se almacena la APITingo nos envia ese mensaje.'''
   
   else:
-    return ("El ticket escaneado no pertenece a TingoID,\nvuelva a escanear un Ticket Valido","red")
+    return ("El codigo escaneado \nNO pertenece a TingoID,\nvuelva a escanear un \ncodigo valido",0)
